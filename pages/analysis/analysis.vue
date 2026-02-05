@@ -4,7 +4,7 @@
     <!-- 1. 顶部标题 -->
     <view class="page-header">
       <text class="title">类型统计</text>
-      <text class="sub-title">{{ currentTime }}年 / TypeID: {{ currentTypeId }}</text>
+      <text class="sub-title">{{ currentTime }}年 </text>
     </view>
 
     <!-- 2. 统计概览 (六个格子) -->
@@ -124,9 +124,11 @@ const getNumClass = (key) => {
 // 列表最后一列 总数 的颜色
 const getTotalClass = (valStr) => {
   const num = parseInt(valStr);
-  if (num > 0) return 'red-text';
-  if (num < 0) return 'green-text';
-  return '';
+  if (num === null || num === undefined) return 'text-gray';
+  // 修改点：正数蓝，负数红
+  if (num > 0) return 'text-blue';   
+  if (num < 0) return 'text-red'; 
+  return 'text-black'; 
 };
 </script>
 
@@ -218,4 +220,8 @@ const getTotalClass = (valStr) => {
 .green-text { color: #27ae60; }
 
 .loading-box { text-align: center; padding: 30rpx; color: #999; }
+.text-blue { color: #007aff !important; }
+.text-red { color: #ff3b30 !important; }
+.text-gray { color: #ccc !important; }
+.text-black { color: #333 !important; }
 </style>

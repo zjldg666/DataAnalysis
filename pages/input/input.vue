@@ -27,6 +27,7 @@
               v-model="item.Qty" 
               placeholder="0" 
               placeholder-class="input-placeholder"
+              :style="{ color: getNumColor(item.Qty) }"
             />
           </view>
         </view>
@@ -191,6 +192,18 @@ const handleSave = () => {
   });
 };
 
+const getNumColor = (val) => {
+  // 1. 如果为空，默认黑色
+  if (val === null || val === '' || val === undefined) return '#333';
+  
+  // 2. 转为数字
+  const num = Number(val);
+  
+  // 3. 判断正负
+  if (num > 0) return '#007aff'; // 蓝色
+  if (num < 0) return '#ff3b30'; // 红色
+  return '#333'; // 0 显示黑色
+};
 </script>
 
 <style lang="scss" scoped>
@@ -198,150 +211,165 @@ const handleSave = () => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f7fa;
+  background-color: #f2f3f5; /* 统一的灰底 */
 }
 
-/* 1. 顶部日期栏 */
+/* --- 1. 顶部日期栏 (黑底风格) --- */
 .header-bar {
-  background-color: #fff;
-  padding: 30rpx 40rpx;
+  background-color: #1a1a1a;
+  padding: 30rpx 40rpx 40rpx;
   display: flex;
   align-items: center;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+  justify-content: space-between; /* 左右两端对齐 */
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
   z-index: 10;
+  border-bottom-left-radius: 30rpx;
+  border-bottom-right-radius: 30rpx;
+  margin-bottom: 20rpx;
 
   .date-label {
     font-size: 30rpx;
     font-weight: bold;
-    color: #333;
-    margin-right: 20rpx;
+    color: #fff; /* 白字 */
   }
 
   .date-picker-box {
-    background-color: #eef2f9;
+    background-color: rgba(255, 255, 255, 0.2); /* 半透明白底 */
     padding: 10rpx 30rpx;
     border-radius: 30rpx;
     display: flex;
     align-items: center;
-    color: #007aff;
+    color: #fff;
     font-weight: bold;
     font-size: 30rpx;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 
     .arrow {
       margin-left: 10rpx;
       font-size: 24rpx;
-      opacity: 0.6;
+      opacity: 0.8;
+      color: #ff9900; /* 橙色箭头点缀 */
     }
   }
 }
 
-/* 2. 中间滚动区域 */
+/* --- 2. 中间滚动区域 --- */
 .grid-content {
-  flex: 1; /* 占满剩余空间 */
-  padding: 20rpx;
+  flex: 1; 
+  padding: 0 20rpx; /* 左右留边距 */
   box-sizing: border-box;
   overflow-y: auto;
+  /* 隐藏滚动条 (兼容性写法) */
+  &::-webkit-scrollbar { display: none; }
 }
 
 .grid-wrapper {
   display: flex;
   flex-wrap: wrap;
-  padding-bottom: 150rpx; /* 防止内容被底部按钮遮挡 */
+  padding-bottom: 180rpx; /* 底部留白给按钮 */
+  /* 让卡片嵌入 Header 下方一点点 */
+  margin-top: -20rpx; 
 }
 
 .grid-item {
-  width: 33.33%; /* 一行三个 */
+  width: 33.33%; 
   padding: 10rpx;
   box-sizing: border-box;
 }
 
-/* 正方形卡片 */
+/* 正方形卡片优化 */
 .square-box {
   background-color: #fff;
   border-radius: 16rpx;
-  /* 利用 aspect-ratio 实现正方形 (兼容性较好)，或者用 padding-bottom 技巧 */
   aspect-ratio: 1 / 1; 
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.03);
-  border: 1rpx solid transparent;
+  justify-content: space-between; /* 上下分布 */
+  padding: 24rpx 16rpx;
+  box-sizing: border-box;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
   transition: all 0.2s;
+  border: 1rpx solid transparent;
 
-  &:active {
-    transform: scale(0.98);
-    border-color: #007aff;
+  /* 获取焦点时的微动效 */
+  &:focus-within {
+    transform: translateY(-4rpx);
+    box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
+    border-color: #333; /* 黑边框 */
   }
 
   .type-name {
-    font-size: 32rpx;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20rpx;
+    font-size: 36rpx; /* 加大名字 */
+    font-weight: 900;
+    color: #000;
+    text-align: center;
+    /* 名字方块背景 */
+    background-color: #f5f5f5;
+    width: 100%;
+    padding: 10rpx 0;
+    border-radius: 8rpx;
   }
 
   .qty-input {
-    width: 80%;
-    height: 70rpx;
-    background-color: #f5f7fa;
-    border-radius: 8rpx;
+    width: 100%;
+    height: 80rpx;
+    background-color: #fff; /* 纯白背景 */
     text-align: center;
-    font-size: 32rpx;
+    font-size: 40rpx; /* 数字加大 */
+    font-weight: bold;
     color: #333;
-    border: 1rpx solid #eee;
-
+    border-bottom: 2rpx solid #eee; /* 只留底边框 */
+    
     &:focus {
-      border-color: #007aff;
-      background-color: #fff;
+      border-bottom-color: #000; /* 聚焦黑底边 */
     }
   }
 }
 
 .loading-box {
   text-align: center;
-  padding: 50rpx;
+  padding: 60rpx;
   color: #999;
+  font-size: 26rpx;
 }
 
-/* 3. 底部按钮区域 */
+/* --- 3. 底部按钮区域 --- */
 .footer-btn-area {
   position: fixed;
-  bottom: 40rpx;
+  bottom: 50rpx;
+  left: 40rpx; 
   right: 40rpx;
-  left: 40rpx; /* 如果想居中或者全宽 */
   z-index: 20;
 }
 
-/* 原来的 .save-btn 样式保持不变 */
 .save-btn {
-  background: linear-gradient(135deg, #007aff, #0056b3);
+  /* 黑色主按钮 */
+  background: #1a1a1a; 
   color: #fff;
-  border-radius: 50rpx;
+  height: 90rpx;
+  line-height: 90rpx;
+  border-radius: 16rpx; /* 方圆角 */
   font-size: 32rpx;
   font-weight: bold;
-  box-shadow: 0 6rpx 20rpx rgba(0, 122, 255, 0.4);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
   border: none;
-  transition: all 0.3s; /* 加个过渡动画更顺滑 */
   
   &:active {
-    opacity: 0.9;
-    transform: translateY(2rpx);
+    transform: scale(0.98);
+    background: #000;
   }
 
-  /* --- 新增：禁用状态样式 --- */
+  /* 禁用状态 */
   &.disabled {
-    background: #ccc; /* 灰色背景 */
-    color: #fff;
-    box-shadow: none; /* 去掉阴影 */
-    opacity: 1;
-    pointer-events: none; /* 禁止点击 */
+    background: #e0e0e0; 
+    color: #999;
+    box-shadow: none;
   }
 }
 
-/* input placeholder 样式 */
 .input-placeholder {
-  color: #ccc;
-  font-size: 28rpx;
+  color: #ddd;
+  font-weight: normal;
+  font-size: 30rpx;
 }
 </style>

@@ -15,7 +15,12 @@
 /* 颜色变量 */
 
 /* 行为相关颜色 */
-$uni-color-primary: #007aff;
+/* 优化后的配色方案 */
+$uni-color-primary: #2979ff;  /* 更明亮的蓝色 */
+$uni-color-secondary: #00e5ff; /* 辅助青色，用于渐变 */
+$uni-bg-color-page: #f4f6f9;   /* 页面底色，带一点冷灰 */
+$uni-card-radius: 24rpx;       /* 统一的大圆角 */
+$uni-shadow-base: 0 8rpx 20rpx rgba(0, 0, 0, 0.05); /* 柔和阴影 */
 $uni-color-success: #4cd964;
 $uni-color-warning: #f0ad4e;
 $uni-color-error: #dd524d;
