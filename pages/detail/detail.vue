@@ -286,36 +286,32 @@ const getNumClass = (num) => {
 <style lang="scss">
 /* 全局底色 */
 .page-container {
-  min-height: 100vh;
-  background-color: #f2f3f5; /* 统一灰底 */
+  @include page-container; /* 统一页面容器 */
+  padding: 0; /* 这里的结构可能不需要默认padding，或者自行覆盖 */
   padding-bottom: 40rpx;
+  background-color: $bg-color-page;
 }
 
 /* --- 1. 头部区域 (仿 Index 风格) --- */
-
 .header-section {
-  background-color: #1a1a1a;
-  /* 上下左右留出足够的呼吸空间 */
+  background-color: $bg-color-header-dark; /* 统一深色头部 */
   padding: 30rpx 40rpx 40rpx;
   border-bottom-left-radius: 30rpx;
   border-bottom-right-radius: 30rpx;
   
-  display: flex;
-  flex-direction: column; /* 改为垂直排列 */
-  gap: 20rpx; /* 两行之间的间距 */
+  @include flex-col;
+  gap: 20rpx;
   
   box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
 }
 
 /* 第一行：跳转链接 */
 .analysis-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.1); /* 淡淡的背景框 */
+  @include flex-between; /* 两端对齐 */
+  background-color: rgba(255, 255, 255, 0.1);
   padding: 16rpx 24rpx;
   border-radius: 12rpx;
-  border: 1px solid rgba(255, 255, 255, 0.2); /* 细微边框 */
+  border: 1px solid rgba(255, 255, 255, 0.2);
   
   &:active {
     background-color: rgba(255, 255, 255, 0.2);
@@ -324,13 +320,13 @@ const getNumClass = (num) => {
 
 .link-text {
   font-size: 28rpx;
-  color: #fff;
+  color: $text-color-white;
   font-weight: bold;
 }
 
 .link-arrow {
   font-size: 28rpx;
-  color: #ff9900; /* 橙色箭头，醒目一点 */
+  color: $text-color-orange; /* 统一橙色 */
   font-weight: bold;
 }
 
@@ -338,7 +334,6 @@ const getNumClass = (num) => {
 .info-row {
   display: flex;
   align-items: center;
-  /* 稍微缩进一点，更有层次感 */
   padding-left: 10rpx; 
 }
 
@@ -349,7 +344,7 @@ const getNumClass = (num) => {
 }
 
 .info-badge {
-  background-color: #ffffff;
+  background-color: $bg-color-card;
   color: #000000;
   font-size: 26rpx;
   font-weight: bold;
@@ -365,37 +360,32 @@ const getNumClass = (num) => {
 
 .info-year {
   font-size: 30rpx;
-  color: #ffffff;
+  color: $text-color-white;
   font-weight: bold;
 }
 
 /* --- 2. 列表区域 --- */
 .list-container {
-  margin: 20rpx; /* 留边距 */
-  background-color: #fff;
-  border-radius: 16rpx;
-  overflow: hidden;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+  margin: 20rpx;
+  @include card-box; /* 统一卡片风格 */
+  padding: 0; /* 列表容器本身不需要内边距，因为内部有list-item */
 }
 
 .list-header {
   background-color: #f8f8f8;
   padding: 20rpx 30rpx;
-  display: flex;
-  justify-content: space-between;
+  @include flex-between;
   border-bottom: 1rpx solid #eee;
   
   text {
     font-size: 26rpx;
-    color: #999;
+    color: $text-color-sub;
     font-weight: bold;
   }
 }
 
 .list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @include flex-between;
   padding: 24rpx 30rpx;
   border-bottom: 1rpx solid #f5f5f5;
   
@@ -410,14 +400,14 @@ const getNumClass = (num) => {
 
 .date-text {
   font-size: 28rpx;
-  color: #333;
+  color: $text-color-main;
   flex: 1;
 }
 
 .num-text {
   font-size: 30rpx;
   font-weight: bold;
-  margin-right: 16rpx; /* 给箭头留位置 */
+  margin-right: 16rpx;
 }
 
 .item-arrow {
@@ -425,17 +415,17 @@ const getNumClass = (num) => {
   color: #ccc;
 }
 
-/* --- 颜色类 --- */
-.text-blue { color: #007aff !important; }
-.text-red { color: #ff3b30 !important; }
+/* --- 颜色类 (直接复用变量) --- */
+.text-blue { color: $text-color-blue !important; }
+.text-red { color: $text-color-red !important; }
 .text-gray { color: #ccc !important; }
-.text-black { color: #333 !important; }
+.text-black { color: $text-color-main !important; }
 
 /* 状态提示 */
 .loading-state, .empty-state {
   text-align: center;
   padding: 60rpx 0;
-  color: #999;
+  color: $text-color-sub;
   font-size: 26rpx;
 }
 
@@ -444,48 +434,41 @@ const getNumClass = (num) => {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(0,0,0,0.6);
   z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center; /* 完美居中 */
 }
 
 .modal-card {
   width: 80%;
-  background-color: #fff;
-  border-radius: 24rpx;
+  background-color: $bg-color-card;
+  border-radius: 24rpx; /* 弹窗圆角可以比普通卡片大一点 */
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   max-height: 70vh;
 }
 
 .modal-header {
   padding: 30rpx;
   border-bottom: 1rpx solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @include flex-between;
   background-color: #fafafa;
 }
 
 .modal-title {
   font-size: 30rpx;
   font-weight: bold;
-  color: #333;
+  color: $text-color-main;
 }
 
 .close-icon {
   font-size: 40rpx;
-  color: #999;
+  color: $text-color-sub;
   line-height: 1;
   padding: 0 10rpx;
 }
 
-/* 弹窗主体内容区 */
 .modal-body {
   padding: 0 30rpx;
   overflow-y: auto;
-  /* 确保主体不超出父容器宽度 */
   width: 100%; 
   box-sizing: border-box; 
 }
@@ -497,8 +480,7 @@ const getNumClass = (num) => {
 
 /* 表头：类型 | 小计 */
 .detail-header {
-  display: flex;
-  justify-content: space-between;
+  @include flex-between;
   padding-bottom: 16rpx;
   border-bottom: 2rpx solid #eee;
   margin-bottom: 10rpx;
@@ -506,52 +488,45 @@ const getNumClass = (num) => {
   
   text { 
     font-size: 24rpx; 
-    color: #999; 
+    color: $text-color-sub; 
     font-weight: bold; 
   }
 }
 
 /* 列表行 */
 .detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center; /* 垂直居中 */
+  @include flex-between;
   padding: 16rpx 0;
   border-bottom: 1rpx solid #f9f9f9;
   font-size: 28rpx;
-  width: 100%; /* 强制占满 */
+  width: 100%;
   
   &.total-row {
     margin-top: 10rpx;
     background-color: #f0f0f0;
-    padding: 16rpx 10rpx; /* 加点内边距 */
+    padding: 16rpx 10rpx;
     border-radius: 8rpx;
     font-weight: bold;
-    /* 总计行加了padding，宽度要减去padding，防止撑破 */
     width: calc(100% - 20rpx); 
     margin-left: auto;
     margin-right: auto;
   }
 }
 
-/* 名字列：限制宽度，超出省略 */
 .row-name { 
-  color: #333; 
-  flex: 1; /* 占据剩余空间 */
-  margin-right: 20rpx; /* 离右边数字远一点 */
-  
-  /* 防止长文字撑开 */
+  color: $text-color-main; 
+  flex: 1;
+  margin-right: 20rpx;
   white-space: nowrap; 
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* 数值列：不换行 */
 .row-val { 
   font-weight: 600; 
-  flex-shrink: 0; /* 防止被挤压 */
+  flex-shrink: 0;
   text-align: right;
-  min-width: 80rpx; /* 给个最小宽度对齐 */
+  min-width: 80rpx;
 }
 
 .modal-footer {
@@ -559,8 +534,8 @@ const getNumClass = (num) => {
 }
 
 .close-btn {
-  background-color: #333; /* 黑钮 */
-  color: #fff;
+  background-color: $text-color-main; /* 统一使用主色黑 */
+  color: $text-color-white;
   text-align: center;
   padding: 20rpx;
   border-radius: 12rpx;

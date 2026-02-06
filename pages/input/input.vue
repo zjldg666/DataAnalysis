@@ -207,20 +207,20 @@ const getNumColor = (val) => {
 </script>
 
 <style lang="scss" scoped>
+/* 使用 mixin 统一页面容器 */
 .container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #f2f3f5; /* 统一的灰底 */
+  @include page-container; // 包含了 min-height, bg-color-page, padding 等
+  padding: 0; /* input页面特殊，不需要默认padding，覆盖掉 */
+  padding-bottom: 40rpx;
+  @include flex-col;
 }
 
 /* --- 1. 顶部日期栏 (黑底风格) --- */
 .header-bar {
-  background-color: #1a1a1a;
+  background-color: $bg-color-header-dark; /* 统一深色背景 */
   padding: 30rpx 40rpx 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* 左右两端对齐 */
+  @include flex-between; /* 替换 flex; space-between */
+  
   box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
   z-index: 10;
   border-bottom-left-radius: 30rpx;
@@ -230,16 +230,17 @@ const getNumColor = (val) => {
   .date-label {
     font-size: 30rpx;
     font-weight: bold;
-    color: #fff; /* 白字 */
+    color: $text-color-white;
   }
 
   .date-picker-box {
-    background-color: rgba(255, 255, 255, 0.2); /* 半透明白底 */
+    background-color: rgba(255, 255, 255, 0.2);
     padding: 10rpx 30rpx;
     border-radius: 30rpx;
-    display: flex;
-    align-items: center;
-    color: #fff;
+    
+    @include flex-center; /* 居中对齐 */
+    
+    color: $text-color-white;
     font-weight: bold;
     font-size: 30rpx;
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -248,7 +249,7 @@ const getNumColor = (val) => {
       margin-left: 10rpx;
       font-size: 24rpx;
       opacity: 0.8;
-      color: #ff9900; /* 橙色箭头点缀 */
+      color: $text-color-orange; /* 统一橙色 */
     }
   }
 }
@@ -256,18 +257,16 @@ const getNumColor = (val) => {
 /* --- 2. 中间滚动区域 --- */
 .grid-content {
   flex: 1; 
-  padding: 0 20rpx; /* 左右留边距 */
+  padding: 0 20rpx;
   box-sizing: border-box;
   overflow-y: auto;
-  /* 隐藏滚动条 (兼容性写法) */
   &::-webkit-scrollbar { display: none; }
 }
 
 .grid-wrapper {
   display: flex;
   flex-wrap: wrap;
-  padding-bottom: 180rpx; /* 底部留白给按钮 */
-  /* 让卡片嵌入 Header 下方一点点 */
+  padding-bottom: 180rpx;
   margin-top: -20rpx; 
 }
 
@@ -279,15 +278,14 @@ const getNumColor = (val) => {
 
 /* 正方形卡片优化 */
 .square-box {
-  background-color: #fff;
-  border-radius: 16rpx;
+  @include card-box; /* 使用通用卡片样式 (白底、阴影、圆角) */
   aspect-ratio: 1 / 1; 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* 上下分布 */
+  
+  @include flex-col;
+  justify-content: space-between;
+  
   padding: 24rpx 16rpx;
   box-sizing: border-box;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
   transition: all 0.2s;
   border: 1rpx solid transparent;
 
@@ -295,15 +293,14 @@ const getNumColor = (val) => {
   &:focus-within {
     transform: translateY(-4rpx);
     box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.08);
-    border-color: #333; /* 黑边框 */
+    border-color: #333;
   }
 
   .type-name {
-    font-size: 36rpx; /* 加大名字 */
+    font-size: 36rpx;
     font-weight: 900;
-    color: #000;
+    color: $text-color-main;
     text-align: center;
-    /* 名字方块背景 */
     background-color: #f5f5f5;
     width: 100%;
     padding: 10rpx 0;
@@ -313,15 +310,15 @@ const getNumColor = (val) => {
   .qty-input {
     width: 100%;
     height: 80rpx;
-    background-color: #fff; /* 纯白背景 */
+    background-color: $bg-color-card;
     text-align: center;
-    font-size: 40rpx; /* 数字加大 */
+    font-size: 40rpx;
     font-weight: bold;
-    color: #333;
-    border-bottom: 2rpx solid #eee; /* 只留底边框 */
+    color: $text-color-main;
+    border-bottom: 2rpx solid #eee;
     
     &:focus {
-      border-bottom-color: #000; /* 聚焦黑底边 */
+      border-bottom-color: #000;
     }
   }
 }
@@ -329,7 +326,7 @@ const getNumColor = (val) => {
 .loading-box {
   text-align: center;
   padding: 60rpx;
-  color: #999;
+  color: $text-color-sub;
   font-size: 26rpx;
 }
 
@@ -343,12 +340,11 @@ const getNumColor = (val) => {
 }
 
 .save-btn {
-  /* 黑色主按钮 */
-  background: #1a1a1a; 
-  color: #fff;
+  background: $bg-color-header-dark; /* 复用深色背景变量 */
+  color: $text-color-white;
   height: 90rpx;
   line-height: 90rpx;
-  border-radius: 16rpx; /* 方圆角 */
+  border-radius: $radius-card;
   font-size: 32rpx;
   font-weight: bold;
   box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
@@ -359,16 +355,15 @@ const getNumColor = (val) => {
     background: #000;
   }
 
-  /* 禁用状态 */
   &.disabled {
     background: #e0e0e0; 
-    color: #999;
+    color: $text-color-sub;
     box-shadow: none;
   }
 }
 
 .input-placeholder {
-  color: #ddd;
+  color: $text-color-placeholder;
   font-weight: normal;
   font-size: 30rpx;
 }

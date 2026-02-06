@@ -39,8 +39,8 @@
             :class="{ 
               'col-date': col === 'Date', 
               'col-total': col === 'TOTAL',
-              'red-text': isNumber(row[col]) && row[col] > 0,
-              'green-text': isNumber(row[col]) && row[col] < 0
+              'text-blue': isNumber(row[col]) && row[col] > 0,
+              'text-red': isNumber(row[col]) && row[col] < 0
             }"
           >
             {{ formatValue(row[col]) }}
@@ -137,14 +137,26 @@ $normal-width: 140rpx;
 
 .container {
   min-height: 100vh;
-  background-color: #f5f7fa;
-  padding: 30rpx 0;
+  background-color: $bg-color-page; /* 使用公共背景色变量 #f5f7fa */
+  padding: 30rpx 0; /* 保持上下有间距，但左右铺满 */
 }
 
 .page-title {
-  padding: 0 30rpx 30rpx 30rpx; text-align: center; display: flex; flex-direction: column;
-  text:first-child { font-size: 34rpx; font-weight: bold; color: #333; }
-  .sub-text { font-size: 22rpx; color: #999; margin-top: 10rpx; }
+  padding: 0 30rpx 30rpx 30rpx; 
+  text-align: center; 
+  @include flex-col; /* 使用公共Mixin */
+  
+  text:first-child { 
+    font-size: 34rpx; 
+    font-weight: bold; 
+    color: $text-color-main; /* 使用公共深色字 #333 */
+  }
+  
+  .sub-text { 
+    font-size: 22rpx; 
+    color: $text-color-sub; /* 使用公共灰色字 #999 */
+    margin-top: 10rpx; 
+  }
 }
 
 .table-wrapper {
@@ -153,7 +165,10 @@ $normal-width: 140rpx;
   border-bottom: 1rpx solid #eee;
 }
 
-.scroll-view { width: 100%; white-space: nowrap; }
+.scroll-view { 
+  width: 100%; 
+  white-space: nowrap; 
+}
 
 .header-row, .data-row {
   display: flex;
@@ -163,18 +178,30 @@ $normal-width: 140rpx;
 
 /* 表头吸顶 (上下滚动时固定头部) */
 .header-row {
-  background-color: #eef2f9;
+  background-color: #eef2f9; /* 保持表格特有的淡蓝灰表头 */
   position: sticky; 
   top: 0;
   z-index: 50; /* 层级最高 */
   border-bottom: 1rpx solid #e1e5eb;
-  .th { font-weight: bold; color: #333; font-size: 26rpx; }
+  
+  .th { 
+    font-weight: bold; 
+    color: $text-color-main; 
+    font-size: 26rpx; 
+  }
 }
 
 .data-row {
   border-bottom: 1rpx solid #f0f0f0;
-  &.stripe { background-color: #fafafa; }
-  .td { font-size: 26rpx; color: #666; }
+  
+  &.stripe { 
+    background-color: #fafafa; 
+  }
+  
+  .td { 
+    font-size: 26rpx; 
+    color: $text-color-main; 
+  }
 }
 
 /* 通用单元格 */
@@ -192,16 +219,16 @@ $normal-width: 140rpx;
 /* 1. 日期列 (第一列) */
 .col-date {
   position: sticky;
-  left: 0;              /* 固定在最左边 */
-  width: $date-width;   /* 设置特定宽度 */
-  z-index: 20;          /* 层级要比普通列高 */
+  left: 0; 
+  width: $date-width; 
+  z-index: 20; 
   border-right: 1rpx solid #eee;
 }
 
 /* 2. 小计列 (第二列) */
 .col-total {
   position: sticky;
-  left: $date-width;    /* 核心：固定位置是第一列的宽度 */
+  left: $date-width; /* 核心：固定位置是第一列的宽度 */
   width: $total-width;
   z-index: 20;
   border-right: 1rpx dashed #ccc; /* 明显的分界线 */
@@ -226,9 +253,22 @@ $normal-width: 140rpx;
   background-color: #fafafa;
 }
 
-/* --- 数字颜色 --- */
-.red-text { color: #e74c3c; font-weight: bold; }
-.green-text { color: #27ae60; font-weight: bold; }
+/* --- 数字颜色修改 --- */
+/* 正数：蓝色 */
+.text-blue { 
+  color: $text-color-blue !important; 
+  font-weight: bold; 
+}
 
-.loading-box, .empty-box { text-align: center; padding: 100rpx; color: #999; }
+/* 负数：红色 */
+.text-red { 
+  color: $text-color-red !important; 
+  font-weight: bold; 
+}
+
+.loading-box, .empty-box { 
+  text-align: center; 
+  padding: 100rpx; 
+  color: $text-color-sub; 
+}
 </style>

@@ -41,9 +41,13 @@
 
       <!-- 第三行：操作按钮（右对齐） -->
       <view class="header-row action-row">
-        <view class="record-btn" @click="handleRecord">
-          <text class="btn-icon">+</text>
-          <text>录入数据</text>
+        <view 
+          class="record-btn" 
+          :class="{ 'disabled-btn': isLimit }" 
+          @click="handleRecord"
+        >
+          <text class="btn-icon" v-if="!isLimit">+</text>
+          <text>{{ isLimit ? '无录入权限' : '录入数据' }}</text>
         </view>
       </view>
     </view>
@@ -103,7 +107,11 @@
     <view v-if="totalData && listData.length === 0" class="empty-state">
       <text>该年份暂无明细数据</text>
     </view>
-
+	
+	<view class="footer-fixed">
+      <!-- 监听子组件加载完成事件 -->
+      <DeviceIdBox @loaded="onDeviceLoaded" />
+    </view>
   </view>
 </template>
 
@@ -111,6 +119,7 @@
 import { ref,onMounted} from 'vue';
 import { onShow } from '@dcloudio/uni-app'; 
 import checkUpdate from '@/uni_modules/uni-upgrade-center-app/utils/check-update'
+import DeviceIdBox from '@/components/DeviceIdBox.vue';
 // --- 状态变量 ---
 const currentYear = ref('');      // 当前选中的年份
 const currentLimitYear = ref(''); // 当前实际年份
@@ -118,6 +127,9 @@ const yearList = ref([]);         // 年份列表
 const yearIndex = ref(0);         // Picker 索引
 const totalData = ref(null);      // 头部统计数据
 const listData = ref([]);         // 列表数据
+const deviceSn = ref('');   // 存储设备码
+const isLimit = ref(false); // 存储权限状态 (true=禁止录入)
+
 onMounted(() => {	
 //检查更新
 	checkUpdate();	   
@@ -140,12 +152,19 @@ onShow(() => {
 
   // 2. 每次页面显示（含返回）都重新调用接口刷新数据
   // 确保有年份才请求
-  if (currentYear.value) {
+  if (currentYear.value && deviceSn.value) {
     getData();
   }
 });
 
-// --- 方法 ---
+// 监听组件加载完成事件
+const onDeviceLoaded = (sn) => {
+  deviceSn.value = sn;
+  // 拿到设备码后，发起请求
+  if (currentYear.value) {
+    getData();
+  }
+};
 
 const getData = () => {
   uni.showLoading({ title: '加载中...', mask: true });
@@ -157,7 +176,8 @@ const getData = () => {
     method: 'POST',
     header: { 'content-type': 'application/json' },
     data: {
-      time: currentYear.value
+      time: currentYear.value,
+	  sn: deviceSn.value
     },
     success: (res) => {
       let responseData = res.data;
@@ -168,6 +188,7 @@ const getData = () => {
 
       if (responseData && !responseData.isError) {
         processData(responseData.result || []);
+		isLimit.value = responseData.limit === true;
       } else {
         processData([]);
       }
@@ -226,9 +247,13 @@ const goDetail = (item) => {
 };
 
 const handleRecord = () => {
-  uni.navigateTo({
-    url: '/pages/input/input'
-  });
+  // 权限拦截
+  if (isLimit.value) {
+    uni.showToast({ title: '暂无录入权限', icon: 'none' });
+    return;
+  }
+  
+  uni.navigateTo({ url: '/pages/input/input' });
 };
 
 const goYearTable = () => {
@@ -238,32 +263,28 @@ const goYearTable = () => {
 };
 </script>
 
-<style lang="scss">
-/* 全局页面底色 */
+<style lang="scss" scoped>
+/* 全局页面容器 */
 .page-container {
   min-height: 100vh;
-  background-color: #ffffff;
-  padding-bottom: 40rpx;
+  background-color: $bg-color-card;
+ 
+  padding-bottom: 180rpx; 
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* --- 1. 头部样式：高度压缩，黑白风 --- */
 .header-section {
-  background-color: #1a1a1a; /* 纯黑背景 */
+  background-color: #1a1a1a; /* 特殊深色背景保留 */
   border-bottom-left-radius: 30rpx;
   border-bottom-right-radius: 30rpx;
-  
-  /* 修改点：大幅减小内边距，压缩高度 */
-  padding: 20rpx 30rpx 30rpx; 
-  
+  padding: 20rpx 30rpx 30rpx;
   color: #ffffff;
-  display: flex;
-  flex-direction: column;
   
-  /* 修改点：减小行与行之间的间距 */
-  gap: 10rpx; 
-  
+  @include flex-col;
+  gap: 10rpx;
   box-shadow: 0 5rpx 15rpx rgba(0, 0, 0, 0.1);
 }
 
@@ -271,14 +292,14 @@ const goYearTable = () => {
 .year-row {
   display: flex;
   align-items: center;
-  height: 60rpx; /* 固定高度，防止撑大 */
+  height: 60rpx;
 }
 
 .year-picker-box {
   display: inline-flex;
   align-items: center;
   background-color: rgba(255, 255, 255, 0.15);
-  padding: 8rpx 20rpx; /* 减小内边距 */
+  padding: 8rpx 20rpx;
   border-radius: 8rpx;
 }
 
@@ -295,31 +316,27 @@ const goYearTable = () => {
 
 /* 第二行：核心数据 */
 .stats-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch; /* 让左右高度一致 */
+  @include flex-between; /* 替换 justify-content: space-between */
+  align-items: stretch; /* 特殊对齐保留 */
   padding: 0 10rpx;
   margin-top: 10rpx;
 }
 
 .stat-item {
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   justify-content: center;
 }
 
-
 .total-btn {
-  background: linear-gradient(135deg, #333333, #444444); /* 深色渐变背景 */
-  border: 1px solid rgba(255, 255, 255, 0.3); /* 明显的边框 */
-  border-radius: 16rpx;
-  padding: 10rpx 24rpx; /* 增加内边距 */
-  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.3); /* 按钮阴影 */
-  margin-left: 40rpx; /* 拉开和左边的距离 */
+  background: linear-gradient(135deg, #333333, #444444);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: $radius-card; /* 使用统一圆角 */
+  padding: 10rpx 24rpx;
+  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.3);
+  margin-left: 40rpx;
   position: relative;
   overflow: hidden;
-  
-  /* 点击时的按压效果 */
+
   &:active {
     transform: scale(0.96);
     background: #222;
@@ -327,13 +344,10 @@ const goYearTable = () => {
 }
 
 .btn-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end; /* 内容靠右对齐 */
+  @include flex-col;
+  align-items: flex-end;
 }
 
-
-/* 按钮内的文字提示 */
 .btn-hint {
   font-size: 18rpx;
   color: rgba(255,255,255,0.5);
@@ -357,7 +371,7 @@ const goYearTable = () => {
 }
 
 .stat-num {
-  font-size: 48rpx; /* 稍微减小一点，避免过于夸张 */
+  font-size: 48rpx;
   font-weight: bold;
   line-height: 1.2;
 }
@@ -372,12 +386,20 @@ const goYearTable = () => {
 .record-btn {
   background-color: #ffffff;
   color: #000000;
-  padding: 10rpx 24rpx; /* 按钮变小一点 */
+  padding: 10rpx 24rpx;
   border-radius: 6rpx;
   font-size: 24rpx;
   font-weight: bold;
   display: flex;
   align-items: center;
+    transition: all 0.3s;
+  
+    /* 新增禁用样式 */
+    &.disabled-btn {
+      background-color: #555; /* 深灰 */
+      color: #aaa;
+      pointer-events: none; /* 甚至可以加这个直接禁点，双重保险 */
+    }
 }
 
 .btn-icon {
@@ -391,69 +413,54 @@ const goYearTable = () => {
 .loading-state, .empty-state {
   padding: 100rpx 0;
   text-align: center;
-  color: #999;
+  color: $text-color-sub; /* 使用统一灰 */
   font-size: 28rpx;
 }
 
 .grid-section {
-  background-color: #f2f3f5;
+  background-color: #f2f3f5; /* 列表区特定灰底 */
   padding: 10rpx;
-  border-radius: 16rpx;
+  border-radius: $radius-card;
   display: flex;
   flex-wrap: wrap;
 }
 
 /* 单个卡片容器 */
 .grid-item-wrapper {
-  width: 33.333%; 
-  padding: 8rpx; /* 间隙稍微调小一点，让卡片宽一点 */
-  box-sizing: border-box; 
-  /* 这里加上之前说的底部间距 */
-  margin-bottom: 16rpx; 
+  width: 33.333%;
+  padding: 8rpx;
+  box-sizing: border-box;
+  margin-bottom: 8rpx;
 }
 
 /* 卡片本体：改为纵向布局 */
 .data-card {
-  background-color: #ffffff;
-  border-radius: 12rpx;
+  @include card-box; /* 引入卡片混合宏：背景、圆角、阴影 */
+  border-radius: 12rpx; /* 如果需要比通用圆角小，可以覆盖，否则删除此行 */
   padding: 16rpx 10rpx;
-  display: flex;
-  flex-direction: column; /* 垂直排列 */
-  gap: 12rpx; /* 上下两排的间距 */
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  @include flex-col;
+  gap: 12rpx;
 }
 
 /* --- 第一排：名字 + 场/正 --- */
-/* --- 第一排：名字 + 场/正 --- */
 .card-top-row {
-  display: flex;
-  align-items: center; /* 垂直居中 */
-  
-  /* 修改点1：改为居中对齐，不再是 space-between */
-  justify-content: center; 
-  
-  /* 修改点2：给名字和数据之间加固定的间距 */
-  gap: 16rpx; 
-  
-  /* 微调：给下方的小计留点呼吸空间 */
+  @include flex-center; /* 替换 display:flex; align-items:center; justify-content:center */
+  gap: 16rpx;
   margin-bottom: 8rpx;
 }
 
 /* 名字方块 */
 .name-square {
-  /* 修改点3：大幅加大尺寸 */
-  width: 85rpx;  
+  width: 85rpx;
   height: 85rpx;
   background-color: #000000;
-  border-radius: 12rpx; /* 圆角也稍微大一点 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  border-radius: 12rpx;
   
+  @include flex-center; /* 完美居中 */
+  flex-shrink: 0;
+
   text {
-    /* 修改点4：名字字体变大 */
-    font-size: 34rpx; 
+    font-size: 34rpx;
     font-weight: bold;
     color: #ffffff;
   }
@@ -461,38 +468,35 @@ const goYearTable = () => {
 
 /* 右边的数据区 */
 .top-stats {
-  display: flex;
-  flex-direction: column;
-  /* 修改点5：去掉右对齐，改为自然左对齐或居中 */
-  justify-content: center; 
-  gap: 6rpx; /* 场和正之间的间距稍微拉大 */
+  @include flex-col;
+  justify-content: center;
+  gap: 6rpx;
 }
 
 .mini-stat {
   display: flex;
   align-items: center;
-  font-size: 22rpx; /* 字体稍微加大一丢丢 */
+  font-size: 22rpx;
   line-height: 1;
-  
+
   .label {
-    color: #999;
+    color: $text-color-sub; /* 统一灰色 */
     margin-right: 6rpx;
   }
   .val {
-    color: #333;
+    color: $text-color-main; /* 统一深色 */
     font-weight: 600;
-    font-size: 24rpx; /* 数字也稍微大一点 */
+    font-size: 24rpx;
   }
 }
 
 /* --- 第二排：小计 --- */
 .card-bottom-row {
-  background-color: #f8f8f8; /* 给小计加个浅底色，更像报表 */
+  background-color: #f8f8f8;
   border-radius: 6rpx;
   padding: 6rpx 0;
-  display: flex;
-  justify-content: center; /* 居中显示 */
-  align-items: center;
+  
+  @include flex-center; /* 替换 flex; justify-content: center; align-items: center */
   gap: 10rpx;
 }
 
@@ -502,19 +506,38 @@ const goYearTable = () => {
 }
 
 .xiaoji-val {
-  font-size: 30rpx; /* 小计数字加大 */
+  font-size: 30rpx;
   color: #000;
-  font-weight: 900; /* 加粗 */
+  font-weight: 900;
   line-height: 1;
 }
 
 /* 负数显示红色 */
 .text-red {
-  color: #ff3b30 !important; /* 鲜艳的红 */
+  color: $text-color-red !important; /* 使用变量 */
 }
 
 /* 正数显示蓝色 */
 .text-blue {
-  color: #007aff !important; /* 鲜艳的蓝 */
+  color: $text-color-blue !important; /* 使用变量 */
+}
+/* 修改后的 .footer-fixed */
+.footer-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  
+  /* 去掉背景色，让它透明 */
+  background-color: transparent; 
+  
+  /* 调整内边距，只留必要的安全距离（比如左右留空，底部防遮挡） */
+  padding: 0 30rpx 4rpx 30rpx; 
+  
+  box-sizing: border-box;
+  z-index: 99;
+  
+  /* 去掉阴影，因为组件自己有阴影 */
+  box-shadow: none; 
 }
 </style>

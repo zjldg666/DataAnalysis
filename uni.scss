@@ -1,81 +1,65 @@
-/**
- * 这里是uni-app内置的常用样式变量
- *
- * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
- * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
- *
- */
+/* uni.scss */
 
-/**
- * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
- *
- * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
- */
+/* 1. 统一颜色变量 */
+$bg-color-page: #f5f7fa;      // 页面通用背景灰 (你页面中常用 #f5f7fa)
+$bg-color-card: #ffffff;      // 卡片白色背景
+$text-color-main: #333333;    // 主要文字颜色
+$text-color-sub: #999999;     // 次要/辅助文字颜色
+$text-color-red: #ff3b30;     // 负数/警告红色 (你项目中常用的红色)
+$text-color-blue: #2979ff;    // 正数/链接蓝色
 
-/* 颜色变量 */
+$bg-color-header-dark: #1a1a1a; // 统一的深色头部背景
+$text-color-orange: #ff9900;    // 统一的橙色 (箭头等)
+$text-color-white: #ffffff;
+$text-color-placeholder: #dddddd;
+/* 2. 统一尺寸变量 */
+$spacing-page: 30rpx;         // 页面左右常用内边距
+$radius-card: 16rpx;          // 卡片圆角 (你项目中多处使用 16rpx)
+$font-size-title: 34rpx;      // 标题字号
+$font-size-base: 28rpx;       // 正文字号
+$font-size-sm: 24rpx;         // 小字号
 
-/* 行为相关颜色 */
-/* 优化后的配色方案 */
-$uni-color-primary: #2979ff;  /* 更明亮的蓝色 */
-$uni-color-secondary: #00e5ff; /* 辅助青色，用于渐变 */
-$uni-bg-color-page: #f4f6f9;   /* 页面底色，带一点冷灰 */
-$uni-card-radius: 24rpx;       /* 统一的大圆角 */
-$uni-shadow-base: 0 8rpx 20rpx rgba(0, 0, 0, 0.05); /* 柔和阴影 */
-$uni-color-success: #4cd964;
-$uni-color-warning: #f0ad4e;
-$uni-color-error: #dd524d;
+/* 3. 混合宏 (Mixins) - 核心复用代码 */
 
-/* 文字基本颜色 */
-$uni-text-color:#333;//基本色
-$uni-text-color-inverse:#fff;//反色
-$uni-text-color-grey:#999;//辅助灰色，如加载更多的提示信息
-$uni-text-color-placeholder: #808080;
-$uni-text-color-disable:#c0c0c0;
+// [布局] Flex 居中
+@mixin flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 
-/* 背景颜色 */
-$uni-bg-color:#ffffff;
-$uni-bg-color-grey:#f8f8f8;
-$uni-bg-color-hover:#f1f1f1;//点击状态颜色
-$uni-bg-color-mask:rgba(0, 0, 0, 0.4);//遮罩颜色
+// [布局] Flex 两端对齐 (常用于 列表行、卡片头部)
+@mixin flex-between {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
 
-/* 边框颜色 */
-$uni-border-color:#c8c7cc;
+// [布局] Flex 列式布局
+@mixin flex-col {
+	display: flex;
+	flex-direction: column;
+}
 
-/* 尺寸变量 */
+// [样式] 通用卡片样式 (阴影、圆角、背景)
+@mixin card-box {
+	background-color: $bg-color-card;
+	border-radius: $radius-card;
+	box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
+	overflow: hidden;
+}
 
-/* 文字尺寸 */
-$uni-font-size-sm:12px;
-$uni-font-size-base:14px;
-$uni-font-size-lg:16px;
+// [样式] 页面基础容器 (铺满全屏，灰色背景)
+@mixin page-container {
+	min-height: 100vh;
+	background-color: $bg-color-page;
+	padding: $spacing-page;
+	box-sizing: border-box;
+}
 
-/* 图片尺寸 */
-$uni-img-size-sm:20px;
-$uni-img-size-base:26px;
-$uni-img-size-lg:40px;
-
-/* Border Radius */
-$uni-border-radius-sm: 2px;
-$uni-border-radius-base: 3px;
-$uni-border-radius-lg: 6px;
-$uni-border-radius-circle: 50%;
-
-/* 水平间距 */
-$uni-spacing-row-sm: 5px;
-$uni-spacing-row-base: 10px;
-$uni-spacing-row-lg: 15px;
-
-/* 垂直间距 */
-$uni-spacing-col-sm: 4px;
-$uni-spacing-col-base: 8px;
-$uni-spacing-col-lg: 12px;
-
-/* 透明度 */
-$uni-opacity-disabled: 0.3; // 组件禁用态的透明度
-
-/* 文章场景相关 */
-$uni-color-title: #2C405A; // 文章标题颜色
-$uni-font-size-title:20px;
-$uni-color-subtitle: #555555; // 二级标题颜色
-$uni-font-size-subtitle:26px;
-$uni-color-paragraph: #3F536E; // 文章段落颜色
-$uni-font-size-paragraph:15px;
+// [文本] 标题通用样式
+@mixin title-text {
+	font-size: $font-size-title;
+	font-weight: bold;
+	color: $text-color-main;
+}
