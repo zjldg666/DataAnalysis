@@ -40,10 +40,16 @@
 			}
 		},
 		{
-			"path": "pages/yearTable/yearTable",
-			"style": {
-				"navigationBarTitleText": ""
-			}
+		  "path": "pages/yearTable/yearTable",
+		  "style": {
+		    "navigationBarTitleText": "",
+		    "enablePullDownRefresh": false,
+		    "app-plus": {
+		      // 核心配置：adjustResize 会压缩 webview 高度，而不是把整个页面推上去
+		      // 这样 sticky 的表头依然会停留在 webview 的顶部
+		      "softinputMode": "adjustResize" 
+		    }
+		  }
 		}
 	],
 	"globalStyle": {
